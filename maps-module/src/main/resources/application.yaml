@@ -22,11 +22,7 @@ logging:
     org.springframework.web: DEBUG
     com.example.yourpackage: TRACE
 
-twilio:
-  account_sid: AC027cb6dfad154e724316794a96ebf8dd
-  auth_token: 75820ddd42927f8d58dde50e29046da4
-  from_number: +12562425169
-  trial_number: +15005550006
+
   enabled: true
   test_mode: true
   authorized_phones:
