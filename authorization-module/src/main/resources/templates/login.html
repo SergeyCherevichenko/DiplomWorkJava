@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Авторизация</title>
+    <script>
+        // Функция для показа секции для ввода кода подтверждения
+        function showVerificationSection(phoneNumber) {
+            console.log("Показ секции для ввода кода подтверждения.");
+            document.getElementById('verifyCodeForm').style.display = 'block';
+            document.getElementById('phoneNumberVerification').value = phoneNumber;
+        }
+
+        // Функция для отправки кода
+        function sendCode() {
+            console.log("Отправка кода...");
+            var form = document.getElementById('sendCodeForm');
+            var formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(result => {
+                console.log('Success:', result);
+                // Если нужно, можно обработать результат для показа сообщения пользователю
+                // Например: если результат содержит ошибку, можно показать её
+                showVerificationSection(document.getElementById('phoneNumber').value);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Произошла ошибка при отправке кода. Пожалуйста, попробуйте снова.');
+            });
+        }
+    </script>
+</head>
+<body>
+<h2>Авторизация</h2>
+
+<!-- Форма для ввода номера телефона и получения кода -->
+<form id="sendCodeForm" action="/api/auth/send-code" method="post">
+    <label for="phoneNumber">Введите номер телефона:</label>
+    <input type="text" id="phoneNumber" name="phoneNumber" required>
+    <button type="button" onclick="sendCode()">Отправить код</button>
+</form>
+
+<!-- Форма для ввода кода подтверждения -->
+<form id="verifyCodeForm" action="/api/auth/verify-code" method="post" style="display:none;">
+    <label for="phoneNumberVerification">Введите номер телефона:</label>
+    <input type="text" id="phoneNumberVerification" name="phoneNumber" required readonly>
+
+    <label for="verificationCode">Введите код подтверждения:</label>
+    <input type="text" id="verificationCode" name="code" required>
+
+    <button type="submit">Подтвердить код</button>
+</form>
+</body>
+</html>
