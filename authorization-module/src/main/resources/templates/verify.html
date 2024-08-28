@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Авторизация</title>
+    <script>
+        // Функция для показа секции для ввода кода подтверждения
+        function showVerificationSection(phoneNumber) {
+            document.getElementById('verifyCodeForm').style.display = 'block';
+            document.getElementById('phoneNumberVerification').value = phoneNumber;
+        }
+
+        // Функция для отправки кода
+        function sendCode() {
+            var form = document.getElementById('sendCodeForm');
+            var formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(result => {
+                showVerificationSection(document.getElementById('phoneNumber').value);
+            })
+            .catch(error => {
+                alert('Произошла ошибка при отправке кода. Пожалуйста, попробуйте снова.');
+            });
+        }
+
+        // Функция для отправки кода подтверждения и перенаправления
+        function verifyCode() {
+            var form = document.getElementById('verifyCodeForm');
+            var formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json()) // Предполагаем, что сервер возвращает JSON
+            .then(result => {
+                if (result.success) {
+                    // Если верификация успешна, перенаправляем на карту
+                    window.location.href = "/map";
+                } else {
+                    alert('Ошибка верификации кода. Пожалуйста, попробуйте снова.');
+                }
+            })
+            .catch(error => {
+                alert('Произошла ошибка при верификации кода. Пожалуйста, попробуйте снова.');
+            });
+            fetch('/api/auth/verify-code', {
+    method: 'POST',
+    body: formData
+})
+.then(response => {
+    if (response.ok) {
+        window.location.href = "/map"; // Перенаправление на страницу с картой
+    } else {
+        alert('Ошибка подтверждения кода. Попробуйте снова.');
+    }
+})
+.catch(error => {
+    console.error('Ошибка:', error);
+});
+        }
+    </script>
+</head>
+<body>
+<h2>Авторизация</h2>
+
+<!-- Форма для отправки кода -->
+<form id="sendCodeForm" action="/api/auth/send-code" method="post">
+    <label for="phoneNumber">Введите номер телефона:</label>
+    <input type="text" id="phoneNumber" name="phoneNumber" required>
+    <button type="button" onclick="sendCode()">Отправить код</button>
+</form>
+
+<!-- Форма для верификации кода -->
+<form id="verifyCodeForm" action="/api/auth/verify-code" method="post" style="display:none;">
+    <label for="phoneNumberVerification">Введите номер телефона:</label>
+    <input type="text" id="phoneNumberVerification" name="phoneNumber" required readonly>
+
+    <label for="verificationCode">Введите код подтверждения:</label>
+    <input type="text" id="verificationCode" name="code" required>
+
+    <!-- Измените кнопку, чтобы вызывала verifyCode -->
+    <button type="button" onclick="verifyCode()">Подтвердить код</button>
+</form>
+</body>
+</html>
