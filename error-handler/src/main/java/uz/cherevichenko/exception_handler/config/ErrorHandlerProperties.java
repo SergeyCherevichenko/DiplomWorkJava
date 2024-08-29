@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @Getter
 @Component
-@ConfigurationProperties(prefix = "exception_handler")
+@ConfigurationProperties(prefix = "exception.handler")
 public class ErrorHandlerProperties {
     // Геттеры и сеттеры
     private boolean enabled = true;
